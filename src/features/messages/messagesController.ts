@@ -8,10 +8,8 @@ class MessagesController {
     const body = req.body;
     try {
       const messagesController = new MessagesService(healthCheckRepository);
-
       const response = await messagesController.sendMessage(body);
       res.status(HttpStatusCode.Created).send(response);
-      return;
     } catch (error) {
       console.error(error);
       next(error);

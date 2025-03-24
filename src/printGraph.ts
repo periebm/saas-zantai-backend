@@ -1,5 +1,5 @@
 import * as tslab from 'tslab';
-import { graph2 } from './IA_test_2/Graph';
+import { graph2 } from './IA_Agent/Graph';
 import fs from 'fs/promises';
 
 export async function printGraph() {

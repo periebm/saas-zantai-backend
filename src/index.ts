@@ -17,8 +17,9 @@ app.use((req, res, next) => {
   res.setHeader('Expect-CT', 'max-age=86400, enforce');
   res.setHeader(
     'Permissions-Policy',
-    'geolocation=(), microphone=(), camera=()', // Bloqueia acesso a esses recursos
+    'geolocation=(), microphone=(), camera=()',
   );
+  next();
 });
 app.use(cors());
 app.use(limiter);
