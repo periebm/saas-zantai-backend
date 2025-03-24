@@ -1,4 +1,53 @@
-import 'dotenv/config';
+import express from 'express';
+import './config/config';
+import cors from 'cors';
+import helmet from 'helmet';
+import { setupRoutes } from './config/routes';
+import { envConfig } from './config/config';
+import cookieParser from 'cookie-parser';
+import errorHandler from './middleware/errorHandler';
+import limiter from './middleware/rateLimiterMiddleware';
+import Winston from './infraestructure/logger/Winston';
+import { ILogger } from './infraestructure/ILogger';
+
+const app = express();
+app.use(express.json());
+app.use(helmet());
+app.use((req, res, next) => {
+  res.setHeader('Expect-CT', 'max-age=86400, enforce');
+  res.setHeader(
+    'Permissions-Policy',
+    'geolocation=(), microphone=(), camera=()', // Bloqueia acesso a esses recursos
+  );
+});
+app.use(cors());
+app.use(limiter);
+app.use(cookieParser());
+
+setupRoutes(app);
+app.use(errorHandler.handleError);
+
+const PORT = envConfig.port || 3001;
+
+app.listen(PORT, () => {
+  console.log(`ZantaiAPI: Up and Running in [${envConfig.env}] mode on port [${PORT}]`);
+});
+
+process.on('uncaughtException', (err) => {
+  const logger: ILogger = new Winston();
+  logger.error('UncaughtException');
+  logger.error(err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  const logger: ILogger = new Winston();
+  logger.error('UnhandledRejection');
+  if (reason) logger.error(reason);
+  process.exit(1);
+});
+
+/* import 'dotenv/config';
 
 import { graph2 } from './IA_test_2/Graph';
 import { printGraph } from './printGraph';
@@ -71,3 +120,4 @@ async function startAi2() {
     console.error('Error starting AI workflow:', error);
   }
 })();
+ */
