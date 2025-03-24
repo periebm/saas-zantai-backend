@@ -1,3 +1,9 @@
+export interface FormattedWhatsAppMessage {
+  number_to: string;
+  number: string;
+  message: string;
+  timestamp: string;
+}
 export interface IMessagesRepository {
-  databaseHealth(): Promise<number | undefined>;
+  saveMessages(messages: FormattedWhatsAppMessage[]): Promise<void>;
 }

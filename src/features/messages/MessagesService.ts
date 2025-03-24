@@ -1,7 +1,51 @@
-import { IMessagesRepository } from './IMessagesRepository';
+import { FormattedWhatsAppMessage, IMessagesRepository } from './IMessagesRepository';
 
 export class MessagesService {
   constructor(private repository: IMessagesRepository) {}
+
+  private async processWhatsAppMessages(payload: any): Promise<FormattedWhatsAppMessage[]> {
+    const formattedMessages: FormattedWhatsAppMessage[] = [];
+
+    try {
+      // Verificação básica do payload
+      if (!payload?.entry || !Array.isArray(payload.entry)) {
+        throw new Error("Payload inválido: estrutura 'entry' não encontrada");
+      }
+
+      for (const entry of payload.entry) {
+        if (!entry?.changes || !Array.isArray(entry.changes)) continue;
+
+        for (const change of entry.changes) {
+          const value = change.value;
+          const messages = value?.messages || [];
+
+          for (const msg of messages) {
+            // Verifica se é mensagem de texto válida
+            if (msg.type !== 'text' || !msg.from || !msg.text?.body || !msg.timestamp) {
+              continue;
+            }
+
+            try {
+              formattedMessages.push({
+                number_to: value.metadata.display_phone_number,
+                number: msg.from,
+                message: msg.text.body,
+                timestamp: msg.timestamp,
+              });
+            } catch (error) {
+              console.error('Erro ao formatar mensagem:', error);
+            }
+          }
+        }
+      }
+
+      // Salva todas as mensagens no banco
+      return formattedMessages;
+    } catch (error) {
+      console.error('Erro no processamento:', error);
+      throw new Error('Falha ao processar mensagens');
+    }
+  }
 
   async sendMessage(body: any) {
     const { message, clientPhone } = body;
@@ -46,6 +90,9 @@ export class MessagesService {
       ],
     };
 
-    return wppMessageStructure;
+    const messages = await this.processWhatsAppMessages(wppMessageStructure);
+    await this.repository.saveMessages(messages);
+
+    return await this.processWhatsAppMessages(wppMessageStructure);
   }
 }
