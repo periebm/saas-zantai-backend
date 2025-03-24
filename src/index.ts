@@ -7,8 +7,9 @@ import { envConfig } from './config/config';
 import cookieParser from 'cookie-parser';
 import errorHandler from './middleware/errorHandler';
 import limiter from './middleware/rateLimiterMiddleware';
-import Winston from './infraestructure/logger/Winston';
-import { ILogger } from './infraestructure/ILogger';
+import Winston from './infrastructure/logger/Winston';
+import { ILogger } from './infrastructure/ILogger';
+import { databaseConnection } from './config/database';
 
 const app = express();
 app.use(express.json());
@@ -33,6 +34,8 @@ const PORT = envConfig.port || 3001;
 app.listen(PORT, () => {
   console.log(`ZantaiAPI: Up and Running in [${envConfig.env}] mode on port [${PORT}]`);
 });
+
+databaseConnection.startDatabase();
 
 process.on('uncaughtException', (err) => {
   const logger: ILogger = new Winston();

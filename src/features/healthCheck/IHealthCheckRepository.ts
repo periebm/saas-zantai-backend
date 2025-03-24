@@ -1,3 +1,3 @@
 export interface IHealthCheckRepository {
-  oracleHealth(): Promise<number | undefined>;
+  databaseHealth(): Promise<number | undefined>;
 }

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { HealthCheckService } from './HealthCheckService';
-import healthCheckRepository from '../../repositories/HealthCheckRepository';
+import healthCheckRepository from '../../repositories/healthCheckRepository';
 
 class HealthCheckController {
   async checkHealth(req: Request, res: Response, next: NextFunction) {

@@ -1,8 +1,8 @@
 import { NextFunction, Response, Request } from 'express';
 import { HttpStatusCode } from 'axios';
 import { AppError } from '../errors/AppError';
-import { ILogger } from '../infraestructure/ILogger';
-import Winston from '../infraestructure/logger/Winston';
+import { ILogger } from '../infrastructure/ILogger';
+import Winston from '../infrastructure/logger/Winston';
 
 class ErrorHandler {
   constructor() {

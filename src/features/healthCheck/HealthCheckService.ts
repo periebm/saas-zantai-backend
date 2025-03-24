@@ -17,18 +17,18 @@ export class HealthCheckService {
   async checkHealth() {
     var uptime = this.formatUpTime(process.uptime());
 
-    const startTimeOracle = new Date().getTime();
-    const oracleHealth = await this.repository.oracleHealth();
-    const endTimeOracle = new Date().getTime();
+    const startTimeDB = new Date().getTime();
+    const dbHealth = await this.repository.databaseHealth();
+    const endTimeDB = new Date().getTime();
 
-    const oracleDbStatus = !oracleHealth
-      ? 'OracleDB connection error'
-      : `Success. Response returned in ${endTimeOracle - startTimeOracle}ms`;
+    const dbStatus = !dbHealth
+      ? 'Database connection error'
+      : `Success. Response returned in ${endTimeDB - startTimeDB}ms`;
 
     return {
         apiName: `saas_zantai_api - ${process.env.NODE_ENV} mode`,
         uptime,
-        oracle: oracleDbStatus
+        oracle: dbStatus
      };
   }
 }

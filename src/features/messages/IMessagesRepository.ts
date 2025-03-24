@@ -1,3 +1,3 @@
 export interface IMessagesRepository {
-  oracleHealth(): Promise<number | undefined>;
+  databaseHealth(): Promise<number | undefined>;
 }
