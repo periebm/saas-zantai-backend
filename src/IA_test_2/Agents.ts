@@ -1,5 +1,7 @@
+import { toolsCondition } from '@langchain/langgraph/prebuilt';
 import { model } from './model';
 import { StateAnnotation } from './State';
+import { END } from '@langchain/langgraph';
 
 export async function filmeSupport(state: typeof StateAnnotation.State) {
   const SYSTEM_TEMPLATE = `Você é um especialista em filmes altamente conhecedor.
@@ -19,7 +21,7 @@ Ajude o usuário da melhor forma possível, mas mantenha suas respostas diretas 
   let trimmedHistory = state.messages;
   // Make the user's question the most recent message in the history.
   // This helps small models stay focused.
-  if (trimmedHistory.at(-1)!._getType() === 'ai') {
+  if (trimmedHistory.at(-1)!.getType() === 'ai') {
     trimmedHistory = trimmedHistory.slice(0, -1);
   }
 
@@ -30,14 +32,15 @@ Ajude o usuário da melhor forma possível, mas mantenha suas respostas diretas 
     },
     ...trimmedHistory,
   ]);
-  const CATEGORIZATION_SYSTEM_TEMPLATE = `Seu trabalho é detectar se um representante de suporte de filmes deseja autorizar a devolução de um filme alugado.`;
-  const CATEGORIZATION_HUMAN_TEMPLATE = ` texto a seguir é uma resposta de um especialista de filmes.
-Extraia se ele deseja autorizar a devolução de um filme alugado ou não.
+  const CATEGORIZATION_SYSTEM_TEMPLATE = `Você é um sistema especialista em roteamento.
+Seu trabalho é detectar se o primeiro agente precisa atuar sozinho ou passar para o agente de BOOKING`;
+  const CATEGORIZATION_HUMAN_TEMPLATE = `A conversa anterior é uma interação entre o Agente  e um usuário.
+Extraia se o agente está apenas respondendo de forma conversacional ou precisará utilizar uma TOOL.
 
 Responda com um objeto JSON contendo uma única chave chamada "nextRepresentative" com um dos seguintes valores:
 
-Se o representante deseja autorizar a devolução do filme, responda apenas com a palavra "DEVOLVER".
-Caso contrário, responda apenas com a palavra "RESPONDER".
+Se o representante deseja utilizar alguam ferramente para responder, responda apenas com a palavra "TOOL" e adicione no tool_calls, sendo que a tool que ele pode utilizar é a get_date_hour_now que retorna a data e hora atual.
+Caso contrário, responda apenas com a palavra "RESPONDER"..
 Aqui está o texto:
 
 <text>
@@ -64,39 +67,5 @@ ${billingRepResponse.content}
   return {
     messages: billingRepResponse,
     nextRepresentative: categorizationOutput.nextRepresentative,
-  };
-}
-
-export async function animeSupport(state: typeof StateAnnotation.State) {
-  const SYSTEM_TEMPLATE = `Você é um especialista em animes altamente conhecedor.
-
-LEMBRESE TODA MENSAGEM QUE VC ENVIAR, INICIE DIZENDO "EU SOU O AGENTE DE ANIMES"
-Seu trabalho é ajudar os usuários com dúvidas sobre animes, oferecendo respostas precisas e informativas.
-Responda da melhor forma possível, mas seja conciso em suas respostas.
-
-Você tem a capacidade de recomendar animes com base no gosto do usuário e de encaminhá-lo para um especialista mais avançado caso precise de informações extremamente detalhadas sobre um anime específico.
-
-Se fizer isso, assuma que o outro especialista já tem todas as informações necessárias sobre o anime ou o interesse do usuário.
-Você não precisa pedir mais detalhes.
-
-Ajude o usuário da melhor forma possível, mas mantenha suas respostas diretas e objetivas.`;
-
-  let trimmedHistory = state.messages;
-  // Make the user's question the most recent message in the history.
-  // This helps small models stay focused.
-  if (trimmedHistory.at(-1)!.getType() === 'ai') {
-    trimmedHistory = trimmedHistory.slice(0, -1);
-  }
-
-  const response = await model.invoke([
-    {
-      role: 'system',
-      content: SYSTEM_TEMPLATE,
-    },
-    ...trimmedHistory,
-  ]);
-
-  return {
-    messages: response,
   };
 }

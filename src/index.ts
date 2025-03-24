@@ -2,7 +2,6 @@ import 'dotenv/config';
 
 import { graph2 } from './IA_test_2/Graph';
 import { printGraph } from './printGraph';
-console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
 
 async function startAi2() {
   const threadId = 'refund_testing_id';
@@ -38,8 +37,9 @@ async function startAi2() {
 
     let assistantMessage = [];
     for await (const value of stream) {
-      if (value?.initial_support?.messages?.[0]?.content) {
-        assistantMessage.push(value.initial_support.messages[0].content);
+      console.log(value);
+      if (value?.receptionist_agent?.messages?.[0]?.content) {
+        assistantMessage.push(value.receptionist_agent.messages[0].content);
       }
       if (value?.anime_support?.messages?.content) {
         assistantMessage.push(value.anime_support.messages.content);
@@ -48,7 +48,6 @@ async function startAi2() {
         assistantMessage.push(value.film_support.messages.content);
       }
     }
-
 
     // Adiciona a mensagem da IA no histórico
     if (assistantMessage) {
