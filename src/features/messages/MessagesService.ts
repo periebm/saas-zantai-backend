@@ -27,9 +27,9 @@ export class MessagesService {
 
             try {
               formattedMessages.push({
-                number_to: value.metadata.display_phone_number,
-                number: msg.from,
-                message: msg.text.body,
+                phone_number_client: value.metadata.display_phone_number,
+                phone_number_to: msg.from,
+                message_text: msg.text.body,
                 timestamp: msg.timestamp,
               });
             } catch (error) {

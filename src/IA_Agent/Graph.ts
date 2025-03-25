@@ -31,14 +31,13 @@ let builder = new StateGraph(StateAnnotation)
   .addEdge('primary_tools', 'receptionist_agent')
 
   /* SPECIALIST AGENT */
-  .addEdge("enter_booking_tools", "booking_agent")
-  .addConditionalEdges('booking_agent', routeBookingAgent, [
-    'booking_tools',
-    END,
-  ]);
+  .addEdge('enter_booking_tools', 'booking_agent')
+  .addConditionalEdges('booking_agent', routeBookingAgent, ['booking_tools', END]);
 
 const checkpointer = new MemorySaver();
 
-export const graph2 = builder.compile({
+export const graph = builder.compile({
   checkpointer,
 });
+
+console.log('Graph Builded Succefully');

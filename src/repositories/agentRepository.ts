@@ -8,14 +8,15 @@ import {
 } from '../features/messages/IMessagesRepository';
 import { format } from 'date-fns'; // Biblioteca para formatação de datas
 import EMessageStatus from '../Enums/EMessageStatus';
+import { IAgentRepository } from '../features/agent/IAgentRepository';
 
-class MessageRepository implements IMessagesRepository {
+class AgentRepository implements IAgentRepository {
   async getNotAnsweredMessages(): Promise<MessageWithId[]> {
     try {
       const response = await databaseConnection.query(
         `SELECT id, phone_number_to, phone_number_client, message_text, timestamp, message_sent_at
         FROM  messages
-        WHERE responded = false AND status = 0`,
+        WHERE responded = false`,
       );
 
       return response.rows;
@@ -88,6 +89,6 @@ class MessageRepository implements IMessagesRepository {
   }
 }
 
-const messageRepository = new MessageRepository();
+const agentRepository = new AgentRepository();
 
-export default messageRepository;
+export default agentRepository;
