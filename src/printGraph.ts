@@ -1,9 +1,12 @@
 import * as tslab from 'tslab';
-import { graph2 } from './IA_Agent/Graph';
 import fs from 'fs/promises';
+import { graphManagerPromise } from './IA_Agent/Graph';
 
 export async function printGraph() {
-  const representation = graph2.getGraph();
+  const graphManager = await graphManagerPromise;
+  const graph = graphManager.getGraph();
+
+  const representation = graph.getGraph();
   const image = await representation.drawMermaidPng();
   const arrayBuffer = await image.arrayBuffer();
 

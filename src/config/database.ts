@@ -54,6 +54,17 @@ class DatabaseConnection {
     }
   }
 
+  public async getPool(): Promise<Pool> {
+    if (!this.pool) {
+      throw new AppError(
+        'Error connecting to database',
+        HttpStatusCode.InternalServerError,
+        'ERROR : Database > getPool',
+      );
+    }
+    return this.pool;
+  }
+
   public async getConnection(): Promise<PoolClient> {
     if (!this.pool) {
       const logger: ILogger = new Winston();

@@ -1,13 +1,17 @@
+import { AIMessage, HumanMessage } from '@langchain/core/messages';
+import { graphManagerPromise } from '../../IA_Agent/Graph';
 import { FormattedWhatsAppMessage, IMessagesRepository } from './IMessagesRepository';
 
+type FormattedMessage = {
+  text: string;
+  type: 'user' | 'bot' | 'config';
+};
 export class MessagesService {
   constructor(private repository: IMessagesRepository) {}
 
   private async processWhatsAppMessages(payload: any): Promise<FormattedWhatsAppMessage[]> {
     const formattedMessages: FormattedWhatsAppMessage[] = [];
-
     try {
-      // Verificação básica do payload
       if (!payload?.entry || !Array.isArray(payload.entry)) {
         throw new Error("Payload inválido: estrutura 'entry' não encontrada");
       }
@@ -27,8 +31,8 @@ export class MessagesService {
 
             try {
               formattedMessages.push({
-                phone_number_client: value.metadata.display_phone_number,
-                phone_number_to: msg.from,
+                phone_number_client: msg.from,
+                phone_number_to: value.metadata.display_phone_number,
                 message_text: msg.text.body,
                 timestamp: msg.timestamp,
               });
@@ -38,8 +42,6 @@ export class MessagesService {
           }
         }
       }
-
-      // Salva todas as mensagens no banco
       return formattedMessages;
     } catch (error) {
       console.error('Erro no processamento:', error);
@@ -47,8 +49,61 @@ export class MessagesService {
     }
   }
 
+  private formatCheckpointMessages(checkpointData: any): FormattedMessage[] {
+    try {
+      const formattedMessages: FormattedMessage[] = [];
+
+      if (!checkpointData?.channel_values?.messages) {
+        return [];
+      }
+      return checkpointData.channel_values.messages.map((message: any) => {
+        if (message instanceof HumanMessage) {
+          return {
+            text:
+              typeof message.content === 'string'
+                ? message.content
+                : JSON.stringify(message.content),
+            type: 'user' as const,
+          };
+        } else if (message instanceof AIMessage) {
+          return {
+            text:
+              typeof message.content === 'string'
+                ? message.content
+                : JSON.stringify(message.content),
+            type: 'bot' as const,
+          };
+        }
+        return {
+          text:
+            typeof message.content === 'string' ? message.content : JSON.stringify(message.content),
+          type: 'config' as const,
+        };
+      });
+
+      return formattedMessages;
+    } catch (error) {
+      console.error('Error formatting checkpoint messages:', error);
+      return [];
+    }
+  }
+
+  async getPastMessages(thread: string) {
+    const graphManager = await graphManagerPromise;
+
+    const readConfig = {
+      configurable: {
+        thread_id: thread,
+      },
+    };
+
+    const checkpointer = graphManager.getCheckpointer();
+    const checkpointMessages = await checkpointer.get(readConfig);
+    return this.formatCheckpointMessages(checkpointMessages);
+  }
+
   async sendMessage(body: any) {
-    const { message, clientPhone } = body;
+    const { message, clientNumber } = body;
 
     const wppMessageStructure = {
       object: 'whatsapp_business_account',
@@ -73,7 +128,7 @@ export class MessagesService {
                 ],
                 messages: [
                   {
-                    from: `${clientPhone}`,
+                    from: `${clientNumber}`,
                     id: 'wamid.HBgMNTU0NzkyNTUzNTI3FQIAEhgWM0VCMDMxMTVBMzgwQjRGNzAyMUU0OAA=',
                     timestamp: '1732843906',
                     text: {
@@ -94,5 +149,9 @@ export class MessagesService {
     await this.repository.saveMessages(messages);
 
     return await this.processWhatsAppMessages(wppMessageStructure);
+  }
+
+  async deleteMessagesByThread(thread: string) {
+    return this.repository.deleteMessagesByThread(thread);
   }
 }

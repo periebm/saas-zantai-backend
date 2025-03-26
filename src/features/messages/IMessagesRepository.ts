@@ -16,4 +16,5 @@ export interface IMessagesRepository {
 
   saveMessages(messages: FormattedWhatsAppMessage[]): Promise<void>;
   setMessageStatus(messageId: number, status: EMessageStatus): Promise<void>;
+  deleteMessagesByThread(thread: string): Promise<void>;
 }

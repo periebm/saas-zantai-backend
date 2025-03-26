@@ -1,8 +1,7 @@
 import { io } from '../..';
 import EMessageStatus from '../../Enums/EMessageStatus';
-import { graph } from '../../IA_Agent/Graph';
+import { graphManagerPromise } from '../../IA_Agent/Graph';
 import {
-  FormattedWhatsAppMessage,
   IMessagesRepository,
   MessageWithId,
 } from '../messages/IMessagesRepository';
@@ -26,6 +25,9 @@ export class AgentService {
       content: message.message_text,
     });
 
+    const graphManager = await graphManagerPromise;
+    const graph = graphManager.getGraph();
+
     const stream = await graph.stream(
       {
         messages,
@@ -39,7 +41,6 @@ export class AgentService {
 
     let assistantMessage = [];
     for await (const value of stream) {
-      console.log(value);
       if (value?.receptionist_agent?.messages?.[0]?.content) {
         assistantMessage.push(value.receptionist_agent.messages[0].content);
       }

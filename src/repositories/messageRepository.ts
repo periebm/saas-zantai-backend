@@ -86,6 +86,26 @@ class MessageRepository implements IMessagesRepository {
       );
     }
   }
+
+  async deleteMessagesByThread(threadId: string): Promise<void> {
+    try {
+      await databaseConnection.query(
+        `DELETE FROM checkpoints
+           WHERE thread_id = $1`,
+        [threadId],
+      );
+
+      await databaseConnection.query('COMMIT'); // Confirma transação
+    } catch (error) {
+      await databaseConnection.query('ROLLBACK'); // Reverte em caso de erro
+      throw new AppError(
+        'Error on database.',
+        HttpStatusCode.InternalServerError,
+        'ERROR : Database > deleteMessagesByThread',
+        error,
+      );
+    }
+  }
 }
 
 const messageRepository = new MessageRepository();

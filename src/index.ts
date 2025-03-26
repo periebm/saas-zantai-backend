@@ -45,6 +45,7 @@ export const io = new Server(server, {
     credentials: true,
   },
 });
+
 databaseConnection.startDatabase();
 
 const interval = 2000; // Intervalo de 5 segundos
