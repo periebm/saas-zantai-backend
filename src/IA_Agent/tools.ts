@@ -3,6 +3,8 @@ import { z } from 'zod';
 
 export const getDateNow = tool(
   () => {
+    console.log('ENTROU DENTRO DE getDateNow TOOL')
+
     return new Date().toISOString();
   },
   {
@@ -16,6 +18,8 @@ export const getDateNow = tool(
 
 export const search_available_appointment_date = tool(
   () => {
+    console.log('ENTROU DENTRO DE search_available_appointment_date TOOL')
+
     const mocked_results = [
       {
         date: '2024-12-26',
@@ -49,6 +53,7 @@ export const search_available_appointment_date = tool(
 
 export const make_doctor_appointment = tool(
   () => {
+    console.log('ENTROU DENTRO DE make_doctor_appointment TOOL')
     return "Appointment was successfully scheduled.";
   },
   {

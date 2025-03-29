@@ -99,6 +99,7 @@ export class MessagesService {
 
     const checkpointer = graphManager.getCheckpointer();
     const checkpointMessages = await checkpointer.get(readConfig);
+    console.log(checkpointMessages)
     return this.formatCheckpointMessages(checkpointMessages);
   }
 

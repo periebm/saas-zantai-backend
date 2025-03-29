@@ -94,6 +94,11 @@ class MessageRepository implements IMessagesRepository {
            WHERE thread_id = $1`,
         [threadId],
       );
+      await databaseConnection.query(
+        `DELETE FROM checkpoint_blobs
+           WHERE thread_id = $1`,
+        [threadId],
+      );
 
       await databaseConnection.query('COMMIT'); // Confirma transação
     } catch (error) {

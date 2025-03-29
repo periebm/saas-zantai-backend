@@ -1,6 +1,6 @@
 import { toolsCondition } from '@langchain/langgraph/prebuilt';
-import { model } from './model';
-import { StateAnnotation } from './State';
+import { model } from '../model';
+import { StateAnnotation } from '../State';
 import { END } from '@langchain/langgraph';
 
 export async function filmeSupport(state: typeof StateAnnotation.State) {

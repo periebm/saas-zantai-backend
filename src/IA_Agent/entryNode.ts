@@ -18,7 +18,7 @@ function createEntryNode(
       lastMessage.tool_calls?.length
     ) {
       const toolCallId = lastMessage.tool_calls[0].id;
-
+      console.log('ACIONOU O TOOL CALL', assistantName)
 
       return {
         messages: [

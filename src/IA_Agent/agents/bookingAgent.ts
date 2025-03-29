@@ -46,7 +46,6 @@ Lembre-se: seu objetivo é oferecer um atendimento confiável, eficiente e human
   };
 }
 
-
 export function routeBookingAgent(state: typeof StateAnnotation.State) {
   const route = toolsCondition(state);
 
@@ -56,21 +55,18 @@ export function routeBookingAgent(state: typeof StateAnnotation.State) {
 
   const { messages } = state;
   const lastMessage = messages[messages.length - 1];
-  if (
+/*   if (
     'tool_calls' in lastMessage &&
     Array.isArray(lastMessage.tool_calls) &&
     lastMessage.tool_calls?.length
   ) {
-    /* if (lastMessage.tool_calls[0].name === 'to_recepcionist_agent') {
+    if (lastMessage.tool_calls[0].name === 'to_recepcionist_agent') {
       return 'recepcionist_agent';
-    } */
+    }
 
     return 'booking_tools';
-  }
+  } */
 
   return END;
-};
-
-export function enterBookingAgent(state: typeof StateAnnotation.State) {
-  return 'amigo estou aqui';
 }
+

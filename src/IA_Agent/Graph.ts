@@ -47,8 +47,8 @@ class GraphManager {
       .addNode('booking_agent', bookingAgent)
       .addNode('primary_tools', toolPrimaryAssistant)
       .addNode('enter_booking_tools', createEntryNode('Booking Agent', 'booking_agent'))
-      .addNode('booking_tools', toolNodeBooking)
-
+/*       .addNode('booking_tools', toolNodeBooking)
+ */
       /* RECEPTIONIST AGENT */
       .addEdge(START, 'receptionist_agent')
       .addConditionalEdges('receptionist_agent', routeReceptionistAgent, [
@@ -60,8 +60,10 @@ class GraphManager {
 
       /* SPECIALIST AGENT */
       .addEdge('enter_booking_tools', 'booking_agent')
-      .addConditionalEdges('booking_agent', routeBookingAgent, ['booking_tools', END]);
-
+      /*       .addEdge('booking_tools', 'booking_agent')
+       */ .addEdge('booking_agent', END);
+    /*        .addConditionalEdges('booking_agent', routeBookingAgent, ['booking_tools', END]);
+     */
     const pool = new Pool({
       connectionString: `postgresql://${envConfig.db.user}:${envConfig.db.password}@${envConfig.db.host}:${envConfig.db.port}/${envConfig.db.database}`,
     });
